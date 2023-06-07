@@ -16,7 +16,7 @@ from fastapi.responses import StreamingResponse, FileResponse
 import math
 import os
 
-model = YOLO('/Models/Large_50/best.pt')
+model = YOLO('Models/large_50/best.pt')
 
 # 2. Create the app object
 app = FastAPI()
