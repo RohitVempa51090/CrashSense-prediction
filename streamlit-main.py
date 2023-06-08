@@ -2,8 +2,6 @@ import streamlit as st
 import cv2
 import numpy as np
 from ultralytics import YOLO
-import firebase_admin
-from firebase_admin import credentials
 from firebase_admin import db
 from firebase_admin import storage
 import math
@@ -12,21 +10,25 @@ import random
 import string
 import shutil
 from datetime import date, datetime
+import firebase_admin
+from firebase_admin import credentials
+
 
 
 def initialize_firebase_app():
-
     databaseURL = 'https://alertsys-4227d-default-rtdb.firebaseio.com'
     storageURL = 'alertsys-4227d.appspot.com'
-    cred = credentials.Certificate("serviceAccountKey.json")
+    cred = credentials.Certificate('serviceAccountKey.json')
     try:
-        firebase = firebase_admin.initialize_app(cred, {
-                'databaseURL': databaseURL,
-                'storageBucket': storageURL
-            }, name="crashsense-predict")
-    except ValueError as e:
         firebase = firebase_admin.get_app()
+    except ValueError as e:
+
+        firebase = firebase_admin.initialize_app(cred, {
+            'databaseURL': databaseURL,
+            'storageBucket': storageURL
+        })
     return firebase
+
 
 
 def predictVideo(videoFile):
@@ -139,8 +141,7 @@ def databasePush(videoUrl):
 def videoUpload():
     bucket = storage.bucket()
     video_path = 'Files/output.mp4'
-    acc_path = ''.join(random.choices(string.ascii_uppercase +
-                             string.digits, k=4))
+    acc_path = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
     firebase_st_path = f'videos/acc{acc_path}.mp4'
     blob = bucket.blob(firebase_st_path)
     blob.upload_from_filename(video_path)
@@ -157,7 +158,7 @@ def host():
     video_file = st.sidebar.file_uploader('Upload CCTV Footage', type=['mp4'])
 
 
-    if(video_file):
+    if video_file:
         with open(os.path.join("Files", video_file.name), 'wb') as f:
             f.write(video_file.getbuffer())
 
@@ -165,7 +166,6 @@ def host():
         with st.spinner('Processing video...'):
             # Call the predictVideo function and pass the uploaded video file
             res = predictVideo(video)
-        # video = predictVideo(video)
         if res == 1:
             out_file = 'Files/output.mp4'
             video_file = open(out_file, 'rb')

@@ -13,9 +13,9 @@ import math
 import os
 
 
-cap = cv2.VideoCapture('Files/NoAccidentVideo7.mp4')
+cap = cv2.VideoCapture('Files/accidentVideo5.mp4')
 
-model = YOLO('Models/small_80/best.pt')
+model = YOLO('Models/medium_80/best.pt')
 
 # className = ['Accident']
 className = ['moderate', 'no-accident', 'severe-accident']
@@ -24,6 +24,8 @@ def process():
     currentFrame = 0
     while True:
         success, frame = cap.read()
+        if not success:
+            break
         result = model(frame, stream=True)
         for r in result:
             for box in r.boxes:
@@ -35,7 +37,7 @@ def process():
 
                 conf = math.ceil((box.conf[0] * 100)) / 100
                 cls = int(box.cls[0])
-                if conf > 0.85:
+                if conf>0.86 and cls != 1:
                     cvzone.putTextRect(frame, f'{className[cls]} {conf}', (x1, y1 - 20))
                     # return currentFrame
         currentFrame += 1
