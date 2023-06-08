@@ -47,3 +47,6 @@ tzdata==2023.3
 ultralytics==8.0.112
 urllib3==1.26.16
 uvicorn==0.22.0
+
+streamlit~=1.23.1
+DateTime~=5.1
